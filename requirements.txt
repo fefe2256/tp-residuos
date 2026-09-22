@@ -1,0 +1,25 @@
+# Deep Learning / Visión por computadora
+# torch se instala igual en Mac, Windows y Linux; el soporte MPS (Mac)
+# viene incluido de fábrica en las versiones >= 2.0, no requiere paquete aparte.
+torch>=2.2.0
+torchvision>=0.17.0
+ultralytics>=8.2.0
+opencv-python>=4.9.0
+
+# Dataset / anotaciones
+pycocotools>=2.0.7
+
+# Tracking de experimentos
+wandb>=0.16.0
+
+# Front
+streamlit>=1.32.0
+
+# EDA / utilidades
+numpy>=1.26.0
+matplotlib>=3.8.0
+tqdm>=4.66.0
+Pillow>=10.2.0
+
+# Descarga de dataset
+gdown>=5.1.0
