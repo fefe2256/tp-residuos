@@ -55,12 +55,15 @@ brazo robótico o a una señal de control sobre una cinta transportadora.
 proyecto-residuos/
 ├── README.md
 ├── requirements.txt
+├── pyproject.toml                  # dependencias para uv (mismas que requirements.txt + grupo dev)
+├── uv.lock                         # versiones exactas resueltas por uv
+├── .python-version                 # Python 3.13 (el que usó uv)
 ├── .gitignore
 ├── .env.example                    # plantilla de variables de entorno (el .env real no se versiona)
 ├── TP_Final_VxC2_PaperVF.docx      # informe/paper final del TP
 │
 ├── data/
-│   ├── download_taco.py            # clona TACO y descarga las imágenes (Flickr)
+│   ├── download_taco.py            # clona TACO y baja las imágenes (Zenodo; --flickr opcional)
 │   ├── prepare_dataset.py          # agrupa 60 categorías -> 6 clases macro; COCO -> YOLO-seg
 │   ├── TACO/                       # (generado) dataset original, no versionado
 │   └── taco_yolo/                  # (generado) dataset ya preparado para entrenar
@@ -85,6 +88,33 @@ proyecto-residuos/
 ```
 
 ## Instalación
+
+### Opción A: con [uv](https://docs.astral.sh/uv/) (recomendada)
+
+```bash
+git clone <url-del-repo>
+cd proyecto-residuos
+uv sync                       # crea .venv con Python 3.13 e instala todo desde uv.lock
+cp .env.example .env          # luego editar .env y completar WANDB_API_KEY
+```
+
+Después anteponé `uv run` a cualquier comando, sin activar nada:
+
+```bash
+uv run python data/download_taco.py
+uv run python data/prepare_dataset.py
+uv run python src/train.py --epochs 60 --freeze-epochs 10
+uv run streamlit run app/app.py
+uv run jupyter lab            # jupyter, ipykernel y torchmetrics vienen en el grupo dev
+```
+
+> Con uv **no hace falta** correr la celda `!pip install -r ../requirements.txt`
+> del notebook principal (ni el `!pip install torchmetrics` del notebook 02):
+> todo ya queda instalado con `uv sync`. Elegí el kernel de `.venv` en Jupyter/VS Code.
+> Si agregás una dependencia, usá `uv add <paquete>` y sumala también a
+> `requirements.txt`.
+
+### Opción B: con pip
 
 ```bash
 git clone <url-del-repo>
@@ -139,16 +169,20 @@ python src/train.py --device cuda    # GPU NVIDIA
 
 **TACO (Trash Annotations in Context):** https://github.com/pedropro/TACO
 
-TACO no aloja las imágenes en el repo (están en Flickr), por lo que se
-descargan con un script propio del proyecto original:
+TACO no aloja las imágenes en el repo. El script oficial las baja de Flickr,
+pero por links caídos consigue menos del 10%, así que `download_taco.py`
+usa por defecto el **mirror de Zenodo** (https://zenodo.org/records/3587843):
+baja `TACO.zip` (~2.7 GB, se valida el MD5), extrae las 1500 imágenes y
+borra el zip. Hacen falta ~5.5 GB libres durante la descarga.
 
 ```bash
-python data/download_taco.py
+python data/download_taco.py            # Zenodo (--keep-zip para conservar el zip, --flickr para el script oficial)
 python data/prepare_dataset.py
 ```
 
-El primer script genera `data/TACO/data/annotations.json` (anotaciones
-COCO, 60 categorías finas) y las imágenes correspondientes. El segundo
+El primer script clona el repo de TACO (de ahí sale
+`data/TACO/data/annotations.json`, anotaciones COCO, 60 categorías finas)
+y deja las imágenes en `data/TACO/data/batch_*/`. El segundo
 agrupa las 60 categorías finas en las 6 clases macro y convierte el
 formato COCO al formato YOLO-seg que espera Ultralytics, dejando el
 dataset listo en `data/taco_yolo/`.

@@ -1,0 +1,43 @@
+[project]
+name = "tp-residuos"
+version = "0.1.0"
+description = "Segmentación de instancias de residuos con YOLOv8-seg sobre TACO (TP Final VpC2, CEIA-UBA)"
+readme = "README.md"
+requires-python = ">=3.10"
+# Mismas dependencias que requirements.txt (se mantiene para quien use pip).
+# Si agregás una, agregala en los dos lados.
+dependencies = [
+    # Deep Learning / Visión por computadora
+    "torch>=2.2.0",
+    "torchvision>=0.17.0",
+    "ultralytics>=8.2.0",
+    "opencv-python>=4.9.0",
+    # Dataset / anotaciones
+    "pycocotools>=2.0.7",
+    # Tracking de experimentos
+    "wandb>=0.16.0",
+    # Front
+    "streamlit>=1.32.0",
+    # EDA / utilidades
+    "numpy>=1.26.0",
+    "matplotlib>=3.8.0",
+    "tqdm>=4.66.0",
+    "Pillow>=10.2.0",
+    # Descarga de dataset
+    "gdown>=5.1.0",
+    "requests>=2.31.0",
+]
+
+[dependency-groups]
+# Se instala por defecto con `uv sync` (usá `--no-dev` para omitirlo).
+dev = [
+    # Para correr los notebooks desde el entorno de uv
+    "jupyter>=1.0.0",
+    "ipykernel>=6.29.0",
+    # Lo usa notebooks/02_Comparacion_MaskRCNN.ipynb
+    "torchmetrics>=1.3.0",
+]
+
+[tool.uv]
+# No es un paquete instalable: los scripts se corren como `python src/<x>.py`.
+package = false
