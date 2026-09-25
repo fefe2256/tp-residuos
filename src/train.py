@@ -26,7 +26,8 @@ from ultralytics import YOLO
 
 from device_utils import get_device_str
 
-DATA_YAML = Path(__file__).parent.parent / "data" / "taco_yolo" / "data.yaml"
+ROOT = Path(__file__).parent.parent
+DATA_YAML = ROOT / "data" / "taco_yolo" / "data.yaml"
 WANDB_PROJECT = "residuos-segmentacion"
 
 
@@ -56,6 +57,21 @@ def main():
     if not Path(args.data).exists():
         print(f"No se encontró {args.data}. Corré antes: python data/prepare_dataset.py")
         return
+
+    # prepare_dataset.py genera el data.yaml aunque no haya imágenes en disco
+    # (p. ej. si no se bajaron de Zenodo), así que chequeamos que haya datos.
+    train_dir = Path(args.data).parent / "images" / "train"
+    if not train_dir.is_dir() or not any(train_dir.iterdir()):
+        print(f"⚠️  {train_dir} está vacío. Faltan las imágenes de TACO en data/TACO/data/batch_*/")
+        print("   (bajalas del mirror de Zenodo) y después corré: python data/prepare_dataset.py")
+        return
+
+    # Ultralytics >= 8.4 anida un project relativo dentro de su runs_dir
+    # (runs/segment/runs/segment/...), así que lo pasamos como path absoluto.
+    project = Path(args.project)
+    if not project.is_absolute():
+        project = ROOT / project
+    args.project = str(project)
 
     if not args.no_wandb:
         wandb.init(
