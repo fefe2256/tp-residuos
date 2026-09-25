@@ -11,7 +11,7 @@ dependencies = [
     "torch>=2.2.0",
     "torchvision>=0.17.0",
     "ultralytics>=8.2.0",
-    "opencv-python>=4.9.0",
+    "opencv-python-headless>=4.9.0",
     # Dataset / anotaciones
     "pycocotools>=2.0.7",
     # Tracking de experimentos
