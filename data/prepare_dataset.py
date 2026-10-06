@@ -37,36 +37,80 @@ RANDOM_SEED = 42
 # Clases macro finales del proyecto (orden = class_id en YOLO)
 MACRO_CLASSES = ["plastico", "papel_carton", "vidrio", "metal", "organico", "otros"]
 
-# Mapeo de categorías originales de TACO (super_category en TACO) -> clase macro.
-# TACO ya trae una jerarquía de "supercategory" que simplifica bastante esto;
-# se ajusta manualmente lo que no calce perfecto.
-SUPERCATEGORY_TO_MACRO = {
-    "Plastic bag & wrapper": "plastico",
-    "Plastic container": "plastico",
+# Mapeo de categorías FINAS de TACO (campo "name") -> clase macro.
+# Se mapea por nombre y no por "supercategory" porque varias supercategorías
+# de TACO mezclan materiales: "Bottle" incluye "Glass bottle", "Cup" incluye
+# "Glass cup" y "Paper cup", "Bottle cap" y "Lid" incluyen las versiones de
+# metal. Mapeando por supercategoría, esas instancias caían en "plastico"
+# (p. ej. 104 botellas de vidrio etiquetadas como plástico).
+# Están listadas las 60 categorías de TACO; si aparece una nueva, cae en "otros".
+CATEGORY_TO_MACRO = {
+    # --- plastico ---
+    "Other plastic bottle": "plastico",
+    "Clear plastic bottle": "plastico",
+    "Plastic bottle cap": "plastico",
+    "Disposable plastic cup": "plastico",
+    "Foam cup": "plastico",
+    "Other plastic cup": "plastico",
+    "Plastic lid": "plastico",
     "Other plastic": "plastico",
-    "Straw": "plastico",
+    "Plastic film": "plastico",
+    "Six pack rings": "plastico",
+    "Garbage bag": "plastico",
+    "Other plastic wrapper": "plastico",
+    "Single-use carrier bag": "plastico",
+    "Polypropylene bag": "plastico",
+    "Crisp packet": "plastico",
+    "Spread tub": "plastico",
+    "Tupperware": "plastico",
+    "Disposable food container": "plastico",
+    "Foam food container": "plastico",
+    "Other plastic container": "plastico",
+    "Plastic glooves": "plastico",      # (sic, así figura en TACO)
+    "Plastic utensils": "plastico",
+    "Plastic straw": "plastico",
     "Styrofoam piece": "plastico",
-    "Lid": "plastico",
-    "Bottle": "plastico",       # se corrige a "vidrio" si el material es vidrio (ver nota abajo)
-    "Bottle cap": "plastico",
-    "Cup": "plastico",
-    "Paper": "papel_carton",
+    # --- papel_carton ---
+    "Toilet tube": "papel_carton",
+    "Other carton": "papel_carton",
+    "Egg carton": "papel_carton",
+    "Drink carton": "papel_carton",     # tetrabrik
+    "Corrugated carton": "papel_carton",
+    "Meal carton": "papel_carton",
+    "Pizza box": "papel_carton",
+    "Paper cup": "papel_carton",
+    "Magazine paper": "papel_carton",
+    "Tissues": "papel_carton",
+    "Wrapping paper": "papel_carton",
+    "Normal paper": "papel_carton",
     "Paper bag": "papel_carton",
-    "Carton": "papel_carton",
+    "Plastified paper bag": "papel_carton",
+    "Paper straw": "papel_carton",
+    # --- vidrio ---
+    "Glass bottle": "vidrio",
+    "Glass cup": "vidrio",
     "Glass jar": "vidrio",
     "Broken glass": "vidrio",
-    "Can": "metal",
+    # --- metal ---
     "Aluminium foil": "metal",
     "Metal bottle cap": "metal",
+    "Metal lid": "metal",
+    "Food Can": "metal",
+    "Aerosol": "metal",
+    "Drink can": "metal",
     "Pop tab": "metal",
     "Scrap metal": "metal",
+    # --- organico ---
     "Food waste": "organico",
-    "Cigarette": "otros",
-    "Unlabeled litter": "otros",
-    "Blister pack": "otros",
-    "Squeezable tube": "otros",
+    # --- otros ---
     "Battery": "otros",
+    "Aluminium blister pack": "otros",
+    "Carded blister pack": "otros",
+    "Rope & strings": "otros",
     "Shoe": "otros",
+    "Squeezable tube": "otros",
+    "Unlabeled litter": "otros",
+    "Cigarette": "otros",
 }
 
 
@@ -77,16 +121,15 @@ def load_coco_annotations(path: Path) -> dict:
 
 def build_category_mapping(coco: dict) -> dict[int, str]:
     """
-    Devuelve {category_id_original: clase_macro} usando supercategory como
-    puente. Cualquier categoría no mapeada cae en "otros".
+    Devuelve {category_id_original: clase_macro} usando el nombre de la
+    categoría fina. Cualquier categoría no mapeada cae en "otros".
     """
     cat_id_to_macro = {}
     unmapped = []
     for cat in coco["categories"]:
-        supercategory = cat.get("supercategory", "")
-        macro = SUPERCATEGORY_TO_MACRO.get(supercategory)
+        macro = CATEGORY_TO_MACRO.get(cat["name"])
         if macro is None:
-            unmapped.append((cat["id"], cat["name"], supercategory))
+            unmapped.append((cat["id"], cat["name"], cat.get("supercategory", "")))
             macro = "otros"
         cat_id_to_macro[cat["id"]] = macro
 
