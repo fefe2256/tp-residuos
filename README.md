@@ -200,7 +200,7 @@ suficientes ejemplos por clase durante el entrenamiento:
 | `otros` | ⚫ Gris / marrón |
 
 El mapeo completo de categoría fina → clase macro está en
-`data/prepare_dataset.py` (diccionario `SUPERCATEGORY_TO_MACRO`), y el
+`data/prepare_dataset.py` (diccionario `CATEGORY_TO_MACRO`, por categoría fina), y el
 mapeo de clase macro → color de contenedor en `src/color_mapping.py`.
 
 > **Nota sobre el código de colores en Argentina.** La Ley 25.916 (GIRSU)
