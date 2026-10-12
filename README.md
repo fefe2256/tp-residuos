@@ -323,10 +323,10 @@ se visualiza inline en `notebooks/00_TP_Informe_Principal.ipynb`.
 
 ## Equipo
 
-- Integrante 1
-- Integrante 2
-- Integrante 3
-- Integrante 4
+- Gonzalo Cuervo
+- Federico Agustin Fernandez de Francesco
+- Nicolas Alberto Tonnelier
+- Marina Andrea Racciatti
 
 ## Roadmap / trabajo futuro
 
